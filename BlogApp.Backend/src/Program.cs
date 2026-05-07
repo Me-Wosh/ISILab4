@@ -16,8 +16,6 @@ builder.Services.AddScoped<PostService>();
 
 var app = builder.Build();
 
-app.UseCors();
-
 var group = app.MapGroup("/api")
     .DisableAntiforgery();
 

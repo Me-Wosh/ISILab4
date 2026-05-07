@@ -1,0 +1,30 @@
+services:
+  db:
+    image: mcr.microsoft.com/mssql/server:2025-CU4-ubuntu-24.04@sha256:a93989eebfb50ae37ee0bfecfaf03648421859558eef6cbff9dec0db3976f192
+    platform: linux/amd64
+    ports:
+      - 1433:1433
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=${MSSQL_SA_PASSWORD}
+    volumes:
+      - mssql_vol:/var/opt/mssql
+  
+  web:
+    build: ./BlogApp.Backend
+    depends_on:
+      - db
+    ports:
+      - 80:80
+      - 443:443
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Release
+      - ASPNETCORE_URLS=https://+:443;http://+:80
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=${HTTPS_CERT_PASSWORD}
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/blogapp.pfx
+      - ConnectionStrings__BlogAppDB=${BlogAppDB_DockerConnectionString}
+    volumes:
+      - ~/.aspnet/https:/https:ro
+
+volumes:
+  mssql_vol:
